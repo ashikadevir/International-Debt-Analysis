@@ -1,27 +1,6 @@
 -- =====================================================================
--- International Debt Analysis - 30 SQL Analytical Questions
--- Database: international_debt_db (MySQL 8.0)
---
--- Definitions used throughout:
---   * "Debt" = External debt stocks, total (series DT.DOD.DECT.CD), in current US$.
---     Summing debt_value across all 576 indicators would mix US$, %, years and
---     nested sub-totals, so every debt total uses this one headline series.
---   * Countries only: is_aggregate = 0 drops the 14 regional / income-group
---     aggregates (e.g. "Low & middle income"), leaving 120 countries.
---   * Totals and rankings use the latest year, 2024. Debt is a stock (amount owed
---     at year end), so adding years together would double-count.
---   * "Indicators" in the debt questions = the 8 debt-stock components below.
---     They do not overlap and add up to total external debt, so shares are valid:
---       PPG multilateral, PPG bilateral, PPG bonds, PPG commercial banks,
---       PPG other private creditors, private nonguaranteed (PNG),
---       short-term debt, use of IMF credit.
--- =====================================================================
 
 USE international_debt_db;
-
--- ---------------------------------------------------------------------
--- Helper views used by the queries below
--- ---------------------------------------------------------------------
 
 -- Total external debt per country per year (2000-2024)
 CREATE OR REPLACE VIEW v_total_debt AS
@@ -50,10 +29,6 @@ WHERE series_code IN ('DT.DOD.MLAT.CD', 'DT.DOD.BLAT.CD', 'DT.DOD.PBND.CD', 'DT.
                       'DT.DOD.PROP.CD', 'DT.DOD.DPNG.CD', 'DT.DOD.DSTC.CD', 'DT.DOD.DIMF.CD')
   AND is_aggregate = 0;
 
-
--- =====================================================================
--- BASIC QUERIES
--- =====================================================================
 
 -- Q1. Retrieve all distinct country names from the dataset.
 SELECT DISTINCT c.short_name AS country, c.country_name AS official_name
@@ -115,11 +90,6 @@ WHERE year = 2024;
 
 -- Q10. Count total number of records in the dataset.
 SELECT COUNT(*) AS total_records FROM debt_fact;
-
-
--- =====================================================================
--- INTERMEDIATE LEVEL
--- =====================================================================
 
 -- Q11. Find the total debt for each country (2024).
 SELECT country, region, income_group, debt_usd AS total_debt_usd
@@ -197,11 +167,6 @@ SELECT country,
 FROM v_total_debt
 WHERE year = 2024
 ORDER BY debt_rank;
-
-
--- =====================================================================
--- ADVANCED LEVEL
--- =====================================================================
 
 -- Q21. Find the top 5 indicators contributing most to global debt (2024).
 SELECT indicator,
